@@ -43,16 +43,16 @@ class GraphData(BaseModel):
 class SimulationResponse(BaseModel):
     success: bool
     message: str
-    solution_path: List[StepResponse]
-    solution_length: int
-    expanded_states: int
-    generated_states: int
-    execution_time_ms: float
-    pq_snapshots: List[Dict[str, Any]]
-    graph_data: GraphData
-    initial_state: List[int]
-    goal_state: Optional[List[int]]
-    algorithm: str
+    solution_path: List[StepResponse] = Field(default_factory=list)
+    solution_length: int = 0
+    expanded_states: int = 0
+    generated_states: int = 0
+    execution_time_ms: float = 0.0
+    pq_snapshots: List[Dict[str, Any]] = Field(default_factory=list)
+    graph_data: GraphData = Field(default_factory=lambda: GraphData(nodes=[], edges=[]))
+    initial_state: List[int] = Field(default_factory=lambda: [0, 0])
+    goal_state: Optional[List[int]] = None
+    algorithm: str = "Search Algorithm"
     simulation_id: Optional[int] = None
     database_saved: bool = False
 

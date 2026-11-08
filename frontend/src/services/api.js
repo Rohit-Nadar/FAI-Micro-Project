@@ -45,7 +45,7 @@ async function request(endpoint, options = {}) {
   } catch (error) {
     if (error.name === 'TypeError' && error.message.includes('fetch')) {
       throw new Error(
-        `Unable to connect to FastAPI backend at ${BASE_URL}. Please verify the server is running on port 8000 or check your network connection.`
+        `Backend server is waking up or temporarily unavailable. Please wait 10 seconds and retry.`
       );
     }
     throw error;

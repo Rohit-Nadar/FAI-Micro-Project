@@ -291,6 +291,7 @@ def solve_water_jug_bfs(
         "generated_states": generated_count,
         "execution_time_ms": elapsed_time,
         "is_optimal": True,
+        "pq_snapshots": [],
         "graph_data": {
             "nodes": nodes,
             "edges": formatted_edges
