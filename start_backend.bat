@@ -7,3 +7,4 @@ echo ========================================================
 cd /d "%~dp0backend"
 "C:\Users\nadar\AppData\Local\Programs\Python\Python312\Scripts\uvicorn.exe" app.main:app --host 127.0.0.1 --port 8000 --reload
 pause
+

@@ -7,3 +7,4 @@ set "PATH=C:\Users\nadar\AppData\Local\Programs\nodejs;%PATH%"
 cd /d "%~dp0frontend"
 npm run dev
 pause
+

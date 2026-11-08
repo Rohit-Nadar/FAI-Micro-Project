@@ -101,3 +101,4 @@ def delete_simulation(db: Session, simulation_id: int) -> bool:
         db.rollback()
         logger.error(f"Error deleting simulation #{simulation_id}: {e}")
         return False
+

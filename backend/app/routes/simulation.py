@@ -145,3 +145,4 @@ def compare_algorithms(request: SearchRequest):
         "path_length_difference": path_diff,
         "expansions_difference": exp_diff
     }
+

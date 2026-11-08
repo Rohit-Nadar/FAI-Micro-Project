@@ -11,3 +11,4 @@ services:
         sync: false
       - key: CORS_ORIGINS
         value: "https://*.vercel.app,http://localhost:5173"
+

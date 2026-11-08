@@ -71,3 +71,4 @@ def remove_history_entry(simulation_id: int, db: Session = Depends(get_db)):
             detail=f"Simulation with ID #{simulation_id} not found or could not be deleted."
         )
     return {"message": f"Simulation #{simulation_id} deleted successfully.", "deleted_id": simulation_id}
+

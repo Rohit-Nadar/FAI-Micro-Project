@@ -156,3 +156,4 @@ export default function PriorityQueue({ snapshot, currentStepIndex }) {
     </div>
   );
 }
+

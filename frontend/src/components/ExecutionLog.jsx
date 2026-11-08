@@ -110,3 +110,4 @@ export default function ExecutionLog({ solutionPath, currentStepIndex, onSelectS
     </div>
   );
 }
+

@@ -12,3 +12,4 @@ When x == target or y == target, h(x, y) = 0 (Goal State).
 def heuristic(x: int, y: int, target: int) -> int:
     """Calculate Manhattan distance to the target for either jug."""
     return min(abs(target - x), abs(target - y))
+

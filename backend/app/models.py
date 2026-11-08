@@ -80,3 +80,4 @@ class SimulationStep(Base):
             "action": self.operation,
             "heuristic": self.heuristic_value,
         }
+

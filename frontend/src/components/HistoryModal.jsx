@@ -214,3 +214,4 @@ export default function HistoryModal({ isOpen, onClose, onLoadSimulation }) {
     </div>
   );
 }
+

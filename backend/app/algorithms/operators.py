@@ -52,3 +52,4 @@ def get_successors(state: Tuple[int, int], a_cap: int, b_cap: int) -> List[Tuple
         successors.append(((x + pour_amount, y - pour_amount), f"Pour {pour_amount}L from Jug B to Jug A"))
 
     return successors
+

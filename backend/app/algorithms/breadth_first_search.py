@@ -299,3 +299,4 @@ def solve_water_jug_bfs(
         "goal_state": [goal_state[0], goal_state[1]],
         "algorithm": "Breadth-First Search"
     }
+

@@ -109,3 +109,4 @@ class HealthResponse(BaseModel):
     status: str
     database: Dict[str, Any]
     version: str
+

@@ -126,3 +126,4 @@ def get_db_status() -> dict:
         "message": db_message,
         "neon_configured": bool(RAW_DATABASE_URL and "neon" in RAW_DATABASE_URL.lower())
     }
+
