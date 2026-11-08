@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import TheorySection from './components/TheorySection';
+import CodeExplanation from './components/CodeExplanation';
 import SimulationDashboard from './components/SimulationDashboard';
 import PriorityQueue from './components/PriorityQueue';
 import StateSpaceGraph from './components/StateSpaceGraph';
@@ -53,6 +54,11 @@ export default function App() {
       <main className="flex-1 space-y-12 sm:space-y-16">
         <Hero onStartDemo={handleStartDemo} />
         <TheorySection />
+        
+        {/* Python Code & Algorithm Mechanics */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CodeExplanation />
+        </div>
         
         {/* Interactive Simulation Dashboard */}
         <SimulationDashboard
@@ -107,3 +113,4 @@ export default function App() {
     </div>
   );
 }
+

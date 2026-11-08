@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Sparkles, ZoomIn, ZoomOut, Maximize2, RefreshCw, Circle, CheckCircle2 } from 'lucide-react';
+import { Sparkles, ZoomIn, ZoomOut, RefreshCw, LayoutGrid, Network } from 'lucide-react';
 
 export default function StateSpaceGraph({ graphData, currentStep, solutionPath }) {
   const [zoom, setZoom] = useState(1);
@@ -7,6 +7,7 @@ export default function StateSpaceGraph({ graphData, currentStep, solutionPath }
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [selectedNode, setSelectedNode] = useState(null);
+  const [layoutMode, setLayoutMode] = useState('grid'); // 'grid' (Lattice) or 'flow' (Tree)
 
   const nodes = graphData?.nodes || [];
   const edges = graphData?.edges || [];
@@ -19,36 +20,66 @@ export default function StateSpaceGraph({ graphData, currentStep, solutionPath }
     return new Set((solutionPath || []).map(s => `${s.jug_a},${s.jug_b}`));
   }, [solutionPath]);
 
-  // Compute a simple radial or grid layout coordinates for nodes
+  // Max capacities from nodes for coordinate normalization
+  const maxCapacities = useMemo(() => {
+    let maxA = 1;
+    let maxB = 1;
+    nodes.forEach(n => {
+      if (n.jug_a > maxA) maxA = n.jug_a;
+      if (n.jug_b > maxB) maxB = n.jug_b;
+    });
+    return { maxA, maxB };
+  }, [nodes]);
+
+  // Compute node coordinates based on active layout mode
   const layoutedNodes = useMemo(() => {
     if (!nodes.length) return [];
     
-    // Group nodes by levels or lay them out systematically
     const width = 800;
-    const height = 500;
-    const padding = 60;
-    
-    // Determine unique x and y values for coordinates or distribute in a spiral/tree
-    const total = nodes.length;
-    const cols = Math.ceil(Math.sqrt(total * 1.5));
-    const cellW = (width - padding * 2) / Math.max(1, cols);
-    const cellH = (height - padding * 2) / Math.max(1, Math.ceil(total / cols));
+    const height = 480;
+    const paddingX = 80;
+    const paddingY = 60;
 
-    return nodes.map((node, index) => {
-      // Find row and col
-      const col = index % cols;
-      const row = Math.floor(index / cols);
-      // Add slight jitter for visual appeal
-      const posX = padding + col * cellW + (row % 2 === 1 ? cellW * 0.25 : 0) + cellW / 2;
-      const posY = padding + row * cellH + cellH / 2;
+    if (layoutMode === 'grid') {
+      // 2D State-Space Lattice: X-axis = Jug A, Y-axis = Jug B
+      const availableW = width - paddingX * 2;
+      const availableH = height - paddingY * 2;
 
-      return {
-        ...node,
-        posX,
-        posY
-      };
-    });
-  }, [nodes]);
+      return nodes.map((node) => {
+        const normX = node.jug_a / Math.max(1, maxCapacities.maxA);
+        const normY = node.jug_b / Math.max(1, maxCapacities.maxB);
+
+        // Invert Y so 0L is at bottom
+        const posX = paddingX + normX * availableW;
+        const posY = height - (paddingY + normY * availableH);
+
+        return {
+          ...node,
+          posX,
+          posY
+        };
+      });
+    } else {
+      // Exploration Sequence Flow
+      const total = nodes.length;
+      const cols = Math.ceil(Math.sqrt(total * 1.6));
+      const cellW = (width - paddingX * 2) / Math.max(1, cols);
+      const cellH = (height - paddingY * 2) / Math.max(1, Math.ceil(total / cols));
+
+      return nodes.map((node, index) => {
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        const posX = paddingX + col * cellW + (row % 2 === 1 ? cellW * 0.2 : 0) + cellW / 2;
+        const posY = paddingY + row * cellH + cellH / 2;
+
+        return {
+          ...node,
+          posX,
+          posY
+        };
+      });
+    }
+  }, [nodes, layoutMode, maxCapacities]);
 
   const nodePositionsMap = useMemo(() => {
     const map = {};
@@ -100,32 +131,34 @@ export default function StateSpaceGraph({ graphData, currentStep, solutionPath }
           <div>
             <h3 className="font-bold text-white text-sm sm:text-base">State Space Search Graph</h3>
             <p className="text-[11px] text-slate-400 font-mono">
-              Live graph generated from backend search ({nodes.length} nodes, {edges.length} edges)
+              {nodes.length} nodes &bull; {edges.length} directed transitions
             </p>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono">
-          <span className="flex items-center gap-1.5 text-cyan-400">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block" />
-            Current
-          </span>
-          <span className="flex items-center gap-1.5 text-emerald-400">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block" />
-            Solution Path
-          </span>
-          <span className="flex items-center gap-1.5 text-amber-400">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
-            Goal
-          </span>
-          <span className="flex items-center gap-1.5 text-blue-400">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
-            Expanded
-          </span>
+        {/* Layout Mode Toggle */}
+        <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-mono">
+          <button
+            onClick={() => setLayoutMode('grid')}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition-colors ${
+              layoutMode === 'grid' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            <span>2D Lattice</span>
+          </button>
+          <button
+            onClick={() => setLayoutMode('flow')}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition-colors ${
+              layoutMode === 'flow' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Network className="w-3.5 h-3.5" />
+            <span>Tree Flow</span>
+          </button>
         </div>
 
-        {/* Zoom & Controls */}
+        {/* Zoom & Reset Controls */}
         <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
           <button
             onClick={() => setZoom(prev => Math.min(2.5, prev + 0.2))}
@@ -159,13 +192,24 @@ export default function StateSpaceGraph({ graphData, currentStep, solutionPath }
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
+        {/* Lattice Coordinate Axes Labels */}
+        {layoutMode === 'grid' && (
+          <>
+            <div className="absolute bottom-2 right-4 text-[10px] font-mono text-cyan-400/60 pointer-events-none">
+              &rarr; Jug A Quantity (L)
+            </div>
+            <div className="absolute top-3 left-3 text-[10px] font-mono text-cyan-400/60 pointer-events-none">
+              &uarr; Jug B Quantity (L)
+            </div>
+          </>
+        )}
+
         <svg
           className="w-full h-full"
-          viewBox="0 0 800 500"
+          viewBox="0 0 800 480"
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
-            {/* Arrow marker for standard edges */}
             <marker
               id="arrow"
               viewBox="0 0 10 10"
@@ -178,7 +222,6 @@ export default function StateSpaceGraph({ graphData, currentStep, solutionPath }
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155" />
             </marker>
 
-            {/* Arrow marker for solution edges */}
             <marker
               id="arrow-solution"
               viewBox="0 0 10 10"
@@ -191,7 +234,6 @@ export default function StateSpaceGraph({ graphData, currentStep, solutionPath }
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981" />
             </marker>
 
-            {/* Glowing filter */}
             <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="3" result="blur" />
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
@@ -215,7 +257,7 @@ export default function StateSpaceGraph({ graphData, currentStep, solutionPath }
                     x2={tgtPos.x}
                     y2={tgtPos.y}
                     stroke={isSol ? '#10b981' : '#1e293b'}
-                    strokeWidth={isSol ? 2.5 : 1.2}
+                    strokeWidth={isSol ? 2.8 : 1.2}
                     strokeDasharray={isSol ? 'none' : '2,2'}
                     markerEnd={isSol ? 'url(#arrow-solution)' : 'url(#arrow)'}
                     className="transition-colors duration-300"
@@ -307,7 +349,7 @@ export default function StateSpaceGraph({ graphData, currentStep, solutionPath }
 
         {/* Selected Node Details Floating Overlay */}
         {selectedNode && (
-          <div className="absolute bottom-3 left-3 p-3 rounded-xl bg-slate-900/90 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl backdrop-blur-md max-w-xs animate-in fade-in">
+          <div className="absolute bottom-3 left-3 p-3 rounded-xl bg-slate-900/95 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl backdrop-blur-md max-w-xs animate-in fade-in">
             <div className="flex items-center justify-between mb-1">
               <span className="font-bold text-cyan-400">State: ({selectedNode.jug_a}, {selectedNode.jug_b})</span>
               <button 
@@ -317,7 +359,7 @@ export default function StateSpaceGraph({ graphData, currentStep, solutionPath }
                 &times;
               </button>
             </div>
-            <p className="text-[11px] text-slate-300">Heuristic: h(n) = {selectedNode.heuristic}</p>
+            <p className="text-[11px] text-slate-300">Heuristic: h(x,y) = {selectedNode.heuristic}</p>
             <p className="text-[11px] text-slate-400">Status: {selectedNode.status.toUpperCase()}</p>
           </div>
         )}
