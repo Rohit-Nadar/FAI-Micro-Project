@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../services/api';
+import { solveWaterJugGBFS } from '../services/solver';
 import confetti from 'canvas-confetti';
 
 export function useSimulation(defaultInputs = {
@@ -32,17 +33,30 @@ export function useSimulation(defaultInputs = {
     setIsPlaying(false);
 
     try {
+      const aCap = Number(activeInputs.jugA);
+      const bCap = Number(activeInputs.jugB);
+      const target = Number(activeInputs.target);
+      const initialA = Number(activeInputs.initialA || 0);
+      const initialB = Number(activeInputs.initialB || 0);
+
       const payload = {
-        jug_a_capacity: Number(activeInputs.jugA),
-        jug_b_capacity: Number(activeInputs.jugB),
-        target: Number(activeInputs.target),
-        initial_a: Number(activeInputs.initialA || 0),
-        initial_b: Number(activeInputs.initialB || 0),
+        jug_a_capacity: aCap,
+        jug_b_capacity: bCap,
+        target,
+        initial_a: initialA,
+        initial_b: initialB,
         algorithm: activeInputs.algorithm || 'gbfs',
         save_to_db: true
       };
 
-      const result = await api.simulate(payload);
+      let result = null;
+      try {
+        result = await api.simulate({ ...payload, timeout: 5000 });
+      } catch (backendErr) {
+        console.warn('Backend waking up or unreachable. Falling back to local AI solver:', backendErr);
+        result = solveWaterJugGBFS(aCap, bCap, target, initialA, initialB);
+      }
+
       setSimulationData(result);
       setCurrentStepIndex(0);
 
