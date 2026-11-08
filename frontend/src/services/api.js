@@ -2,10 +2,22 @@
  * API Service for communicating with FastAPI Backend (Render / Localhost).
  */
 
-const BASE_URL = import.meta.env.VITE_API_URL 
-  ? import.meta.env.VITE_API_URL.replace(/\/+$/, '') 
-  : 'http://127.0.0.1:8000';
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return `http://${host}:8000`;
+    }
+    // For online tunnels or custom hostnames without VITE_API_URL, route through Vite proxy
+    return '/api';
+  }
+  return 'http://127.0.0.1:8000';
+};
 
+const BASE_URL = getBaseUrl();
 console.log(`[API Service] Configured backend URL: ${BASE_URL}`);
 
 /**

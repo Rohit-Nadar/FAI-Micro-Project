@@ -38,34 +38,37 @@ def setup_engine():
     global engine, is_connected, db_type, db_message
 
     if DATABASE_URL:
-        try:
-            logger.info("Attempting connection to PostgreSQL database...")
-            # If using postgresql, ensure SSL mode if connecting to Neon
-            c_args = {}
-            if "postgresql" in DATABASE_URL and "sslmode" not in DATABASE_URL:
-                c_args = {"sslmode": "require"}
+        # Candidate drivers to try if one is missing
+        candidate_urls = [DATABASE_URL]
+        if DATABASE_URL.startswith("postgresql://"):
+            candidate_urls.append(DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1))
+            candidate_urls.append(DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1))
 
-            test_engine = create_engine(
-                DATABASE_URL,
-                connect_args=c_args,
-                pool_pre_ping=True,
-                pool_recycle=300
-            )
-            # Test immediate connectivity with a quick query
-            with test_engine.connect() as conn:
-                conn.execute(text("SELECT 1"))
-            
-            engine = test_engine
-            is_connected = True
-            db_type = "Neon PostgreSQL"
-            db_message = "Successfully connected to Neon PostgreSQL database."
-            logger.info(db_message)
-            return
-        except Exception as e:
-            logger.warning(
-                f"Failed to connect to Neon PostgreSQL ({e}). Falling back to local SQLite database."
-            )
-            db_message = f"PostgreSQL connection failed ({type(e).__name__}). Using local fallback database."
+        for url_candidate in candidate_urls:
+            try:
+                logger.info(f"Attempting PostgreSQL connection with: {url_candidate.split('@')[-1]}")
+                c_args = {}
+                if "sslmode" not in url_candidate and "pg8000" not in url_candidate:
+                    c_args = {"sslmode": "require"}
+
+                test_engine = create_engine(
+                    url_candidate,
+                    connect_args=c_args,
+                    pool_pre_ping=True,
+                    pool_recycle=300
+                )
+                with test_engine.connect() as conn:
+                    conn.execute(text("SELECT 1"))
+
+                engine = test_engine
+                is_connected = True
+                db_type = "Neon PostgreSQL"
+                db_message = "Successfully connected to Neon PostgreSQL database."
+                logger.info(db_message)
+                return
+            except Exception as e:
+                logger.warning(f"Connection attempt failed ({type(e).__name__}): {e}")
+                db_message = f"PostgreSQL connection failed ({type(e).__name__}). Using local fallback database."
 
     # Fallback to local SQLite database so history and simulations always work locally
     try:
