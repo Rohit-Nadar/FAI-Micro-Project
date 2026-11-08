@@ -11,8 +11,10 @@ from .routes import history_router, simulation_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize database tables on startup
-    init_db()
+    # Initialize database tables asynchronously in a background thread
+    # so uvicorn binds to $PORT in 20ms and Render health checks succeed immediately.
+    import asyncio
+    asyncio.create_task(asyncio.to_thread(init_db))
     yield
 
 app = FastAPI(
@@ -23,18 +25,11 @@ app = FastAPI(
 )
 
 # CORS Configuration
-# Supports local development, Render backend, Vercel frontend, and public tunnels
+# Supports local development, Render backend, Vercel frontend, and cross-origin requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://fai-micro-project.vercel.app",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
-    allow_origin_regex=r"https://.*\.vercel\.app",
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

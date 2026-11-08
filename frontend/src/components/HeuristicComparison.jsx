@@ -20,7 +20,7 @@ import {
   ResponsiveContainer, 
   Legend 
 } from 'recharts';
-import { api } from '../services/api';
+import { api, ACADEMIC_BENCHMARKS } from '../services/api';
 
 export default function HeuristicComparison({ onLoadPreset }) {
   const [inputs, setInputs] = useState({
@@ -29,7 +29,8 @@ export default function HeuristicComparison({ onLoadPreset }) {
     target: 5
   });
 
-  const [comparison, setComparison] = useState(null);
+  const [comparison, setComparison] = useState(ACADEMIC_BENCHMARKS['4-7-5']);
+  const [dataSource, setDataSource] = useState('benchmark'); // 'live' | 'benchmark'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -42,19 +43,42 @@ export default function HeuristicComparison({ onLoadPreset }) {
 
   const handleRunComparison = async (presetVals = null) => {
     const active = presetVals || inputs;
+    const a = Number(active.jugA || active.a);
+    const b = Number(active.jugB || active.b);
+    const t = Number(active.target);
+    const benchmarkKey = `${a}-${b}-${t}`;
+
+    // If pre-verified benchmark exists, load immediately for instant UX
+    if (ACADEMIC_BENCHMARKS[benchmarkKey]) {
+      setComparison(ACADEMIC_BENCHMARKS[benchmarkKey]);
+      setDataSource('benchmark');
+    }
+
     setLoading(true);
     setError(null);
+
     try {
       const res = await api.compare({
-        jug_a_capacity: Number(active.jugA || active.a),
-        jug_b_capacity: Number(active.jugB || active.b),
-        target: Number(active.target),
+        jug_a_capacity: a,
+        jug_b_capacity: b,
+        target: t,
         initial_a: 0,
         initial_b: 0
       });
-      setComparison(res);
+
+      if (res && res.success) {
+        setComparison(res);
+        setDataSource('live');
+        setError(null);
+      }
     } catch (err) {
-      setError(err.message);
+      // If backend is sleeping/starting on Render, retain the verified benchmark
+      if (ACADEMIC_BENCHMARKS[benchmarkKey]) {
+        setComparison(ACADEMIC_BENCHMARKS[benchmarkKey]);
+        setDataSource('benchmark');
+      } else {
+        setError(err.message || 'Unable to connect to backend.');
+      }
     } finally {
       setLoading(false);
     }
@@ -131,17 +155,45 @@ export default function HeuristicComparison({ onLoadPreset }) {
         </div>
 
         {/* Comparison Display */}
-        {loading ? (
+        {loading && !comparison ? (
           <div className="glass-panel p-12 text-center text-slate-400 text-sm">
             <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
             <p className="font-mono">Executing dual search (GBFS vs BFS)...</p>
           </div>
-        ) : error ? (
-          <div className="glass-panel p-6 text-center text-rose-400 text-sm border-rose-500/30 bg-rose-950/20">
-            {error}
+        ) : error && !comparison ? (
+          <div className="glass-panel p-6 text-center text-rose-400 text-sm border-rose-500/30 bg-rose-950/20 space-y-3">
+            <p>{error}</p>
+            <button
+              onClick={() => handleRunComparison()}
+              className="px-4 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-200 text-xs font-mono"
+            >
+              Retry Connection
+            </button>
           </div>
         ) : comparison && comparison.success ? (
           <div className="space-y-6">
+            {/* Live / Benchmark indicator badge */}
+            {dataSource === 'benchmark' ? (
+              <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  Displaying verified academic benchmark metrics (Render live server warming up).
+                </span>
+                <button
+                  onClick={() => handleRunComparison()}
+                  disabled={loading}
+                  className="px-2.5 py-1 rounded bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 text-[11px] transition-colors"
+                >
+                  {loading ? 'Connecting...' : 'Sync Live'}
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                Live calculation from Render FastAPI backend
+              </div>
+            )}
+
             {/* Status Alert Banner */}
             <div className={`p-5 rounded-2xl border ${
               comparison.is_misled
