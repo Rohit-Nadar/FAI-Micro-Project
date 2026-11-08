@@ -152,13 +152,26 @@ export function solveWaterJugGBFS(aCap, bCap, target, initialA = 0, initialB = 0
     // Goal Check
     if (curr[0] === target || curr[1] === target) {
       goalState = curr;
+      const act = parents.get(currKey)?.action || 'Goal Reached';
       pqSnapshots.push({
         step: expandedCount,
+        popped_state: curr,
         selected_state: curr,
         heuristic: currH,
-        action: parents.get(currKey).action,
+        h: currH,
+        action: act,
+        action_taken: act,
+        reason: `Goal reached! Either Jug A or Jug B contains exactly ${target}L.`,
         selection_reason: `Goal reached! Either Jug A or Jug B contains exactly ${target}L.`,
+        queue_size: pq.length,
+        queue_contents: currentQueueSnapshot.map(item => ({
+          priority: item.rank,
+          state: item.state,
+          h: item.heuristic,
+          heuristic: item.heuristic
+        })),
         queue_state: currentQueueSnapshot,
+        successors: [],
         generated_successors: []
       });
       break;
@@ -203,13 +216,26 @@ export function solveWaterJugGBFS(aCap, bCap, target, initialA = 0, initialB = 0
       }
     }
 
+    const act = parents.get(currKey)?.action || 'Initial State';
     pqSnapshots.push({
       step: expandedCount,
+      popped_state: curr,
       selected_state: curr,
       heuristic: currH,
-      action: parents.get(currKey).action,
+      h: currH,
+      action: act,
+      action_taken: act,
+      reason: `Lowest heuristic value in frontier h(n)=${currH}.`,
       selection_reason: `Lowest heuristic value in frontier h(n)=${currH}.`,
+      queue_size: pq.length,
+      queue_contents: currentQueueSnapshot.map(item => ({
+        priority: item.rank,
+        state: item.state,
+        h: item.heuristic,
+        heuristic: item.heuristic
+      })),
       queue_state: currentQueueSnapshot,
+      successors: generatedInThisStep,
       generated_successors: generatedInThisStep
     });
   }
@@ -402,3 +428,4 @@ export function solveWaterJugBFS(aCap, bCap, target, initialA = 0, initialB = 0)
     algorithm: 'Breadth-First Search (Optimal)'
   };
 }
+

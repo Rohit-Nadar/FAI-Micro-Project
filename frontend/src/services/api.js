@@ -81,14 +81,26 @@ export const ACADEMIC_BENCHMARKS = {
       expanded_states: 18,
       generated_states: 63,
       execution_time_ms: 1.2,
-      algorithm: 'Greedy Best-First Search'
+      algorithm: 'Greedy Best-First Search',
+      solution_path: [
+        { jug_a: 0, jug_b: 0 }, { jug_a: 0, jug_b: 7 }, { jug_a: 4, jug_b: 3 },
+        { jug_a: 0, jug_b: 3 }, { jug_a: 3, jug_b: 0 }, { jug_a: 3, jug_b: 7 },
+        { jug_a: 4, jug_b: 6 }, { jug_a: 0, jug_b: 6 }, { jug_a: 4, jug_b: 2 },
+        { jug_a: 0, jug_b: 2 }, { jug_a: 2, jug_b: 0 }, { jug_a: 2, jug_b: 7 },
+        { jug_a: 4, jug_b: 5 }
+      ]
     },
     bfs: {
       solution_length: 8,
       expanded_states: 15,
       generated_states: 55,
       execution_time_ms: 0.8,
-      algorithm: 'Breadth-First Search (Optimal)'
+      algorithm: 'Breadth-First Search (Optimal)',
+      solution_path: [
+        { jug_a: 0, jug_b: 0 }, { jug_a: 4, jug_b: 0 }, { jug_a: 0, jug_b: 4 },
+        { jug_a: 4, jug_b: 4 }, { jug_a: 1, jug_b: 7 }, { jug_a: 1, jug_b: 0 },
+        { jug_a: 0, jug_b: 1 }, { jug_a: 4, jug_b: 1 }, { jug_a: 0, jug_b: 5 }
+      ]
     }
   },
   '4-9-6': {
@@ -103,14 +115,27 @@ export const ACADEMIC_BENCHMARKS = {
       expanded_states: 22,
       generated_states: 79,
       execution_time_ms: 1.5,
-      algorithm: 'Greedy Best-First Search'
+      algorithm: 'Greedy Best-First Search',
+      solution_path: [
+        { jug_a: 0, jug_b: 0 }, { jug_a: 4, jug_b: 0 }, { jug_a: 0, jug_b: 4 },
+        { jug_a: 4, jug_b: 4 }, { jug_a: 0, jug_b: 8 }, { jug_a: 4, jug_b: 8 },
+        { jug_a: 3, jug_b: 9 }, { jug_a: 3, jug_b: 0 }, { jug_a: 0, jug_b: 3 },
+        { jug_a: 4, jug_b: 3 }, { jug_a: 0, jug_b: 7 }, { jug_a: 4, jug_b: 7 },
+        { jug_a: 2, jug_b: 9 }, { jug_a: 2, jug_b: 0 }, { jug_a: 0, jug_b: 2 },
+        { jug_a: 4, jug_b: 2 }, { jug_a: 0, jug_b: 6 }
+      ]
     },
     bfs: {
       solution_length: 8,
       expanded_states: 16,
       generated_states: 59,
       execution_time_ms: 0.9,
-      algorithm: 'Breadth-First Search (Optimal)'
+      algorithm: 'Breadth-First Search (Optimal)',
+      solution_path: [
+        { jug_a: 0, jug_b: 0 }, { jug_a: 0, jug_b: 9 }, { jug_a: 4, jug_b: 5 },
+        { jug_a: 0, jug_b: 5 }, { jug_a: 4, jug_b: 1 }, { jug_a: 0, jug_b: 1 },
+        { jug_a: 1, jug_b: 0 }, { jug_a: 1, jug_b: 9 }, { jug_a: 4, jug_b: 6 }
+      ]
     }
   },
   '3-7-5': {
@@ -125,14 +150,25 @@ export const ACADEMIC_BENCHMARKS = {
       expanded_states: 16,
       generated_states: 55,
       execution_time_ms: 1.1,
-      algorithm: 'Greedy Best-First Search'
+      algorithm: 'Greedy Best-First Search',
+      solution_path: [
+        { jug_a: 0, jug_b: 0 }, { jug_a: 3, jug_b: 0 }, { jug_a: 0, jug_b: 3 },
+        { jug_a: 3, jug_b: 3 }, { jug_a: 0, jug_b: 6 }, { jug_a: 3, jug_b: 6 },
+        { jug_a: 2, jug_b: 7 }, { jug_a: 2, jug_b: 0 }, { jug_a: 0, jug_b: 2 },
+        { jug_a: 3, jug_b: 2 }, { jug_a: 0, jug_b: 5 }
+      ]
     },
     bfs: {
       solution_length: 8,
       expanded_states: 16,
       generated_states: 59,
       execution_time_ms: 0.8,
-      algorithm: 'Breadth-First Search (Optimal)'
+      algorithm: 'Breadth-First Search (Optimal)',
+      solution_path: [
+        { jug_a: 0, jug_b: 0 }, { jug_a: 0, jug_b: 7 }, { jug_a: 3, jug_b: 4 },
+        { jug_a: 0, jug_b: 4 }, { jug_a: 3, jug_b: 1 }, { jug_a: 0, jug_b: 1 },
+        { jug_a: 1, jug_b: 0 }, { jug_a: 1, jug_b: 7 }, { jug_a: 3, jug_b: 5 }
+      ]
     }
   },
   '4-3-2': {
@@ -147,14 +183,22 @@ export const ACADEMIC_BENCHMARKS = {
       expanded_states: 6,
       generated_states: 16,
       execution_time_ms: 0.5,
-      algorithm: 'Greedy Best-First Search'
+      algorithm: 'Greedy Best-First Search',
+      solution_path: [
+        { jug_a: 0, jug_b: 0 }, { jug_a: 0, jug_b: 3 }, { jug_a: 3, jug_b: 0 },
+        { jug_a: 3, jug_b: 3 }, { jug_a: 4, jug_b: 2 }
+      ]
     },
     bfs: {
       solution_length: 4,
       expanded_states: 8,
       generated_states: 27,
       execution_time_ms: 0.6,
-      algorithm: 'Breadth-First Search (Optimal)'
+      algorithm: 'Breadth-First Search (Optimal)',
+      solution_path: [
+        { jug_a: 0, jug_b: 0 }, { jug_a: 0, jug_b: 3 }, { jug_a: 3, jug_b: 0 },
+        { jug_a: 3, jug_b: 3 }, { jug_a: 4, jug_b: 2 }
+      ]
     }
   }
 };

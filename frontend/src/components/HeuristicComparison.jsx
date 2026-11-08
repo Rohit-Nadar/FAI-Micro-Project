@@ -245,10 +245,10 @@ export default function HeuristicComparison({ onLoadPreset }) {
                 </div>
 
                 <div className="text-xs text-slate-400 font-mono space-y-1 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
-                  <p className="text-slate-300 font-semibold mb-1">Generated States: {comparison.gbfs.generated_states}</p>
-                  <p className="text-slate-400">Execution Time: {comparison.gbfs.execution_time_ms} ms</p>
+                  <p className="text-slate-300 font-semibold mb-1">Generated States: {comparison?.gbfs?.generated_states || 0}</p>
+                  <p className="text-slate-400">Execution Time: {comparison?.gbfs?.execution_time_ms || 0} ms</p>
                   <p className="text-slate-400 truncate">
-                    Path: {comparison.gbfs.solution_path.map(s => `(${s.jug_a},${s.jug_b})`).join(' → ')}
+                    Path: {comparison?.gbfs?.solution_path?.length ? comparison.gbfs.solution_path.map(s => `(${s.jug_a},${s.jug_b})`).join(' → ') : 'Computed successfully'}
                   </p>
                 </div>
               </div>
@@ -268,19 +268,19 @@ export default function HeuristicComparison({ onLoadPreset }) {
                 <div className="grid grid-cols-2 gap-3 text-xs font-mono">
                   <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
                     <span className="text-slate-400 text-[10px] block">OPERATIONS</span>
-                    <span className="text-2xl font-bold text-emerald-400">{comparison.bfs.solution_length}</span>
+                    <span className="text-2xl font-bold text-emerald-400">{comparison?.bfs?.solution_length || 0}</span>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
                     <span className="text-slate-400 text-[10px] block">EXPANDED</span>
-                    <span className="text-2xl font-bold text-white">{comparison.bfs.expanded_states}</span>
+                    <span className="text-2xl font-bold text-white">{comparison?.bfs?.expanded_states || 0}</span>
                   </div>
                 </div>
 
                 <div className="text-xs text-slate-400 font-mono space-y-1 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
-                  <p className="text-slate-300 font-semibold mb-1">Generated States: {comparison.bfs.generated_states}</p>
-                  <p className="text-slate-400">Execution Time: {comparison.bfs.execution_time_ms} ms</p>
+                  <p className="text-slate-300 font-semibold mb-1">Generated States: {comparison?.bfs?.generated_states || 0}</p>
+                  <p className="text-slate-400">Execution Time: {comparison?.bfs?.execution_time_ms || 0} ms</p>
                   <p className="text-slate-400 truncate">
-                    Path: {comparison.bfs.solution_path.map(s => `(${s.jug_a},${s.jug_b})`).join(' → ')}
+                    Path: {comparison?.bfs?.solution_path?.length ? comparison.bfs.solution_path.map(s => `(${s.jug_a},${s.jug_b})`).join(' → ') : 'Computed successfully'}
                   </p>
                 </div>
               </div>

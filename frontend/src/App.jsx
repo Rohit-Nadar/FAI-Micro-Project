@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import TheorySection from './components/TheorySection';
@@ -13,7 +13,44 @@ import HistoryModal from './components/HistoryModal';
 import Footer from './components/Footer';
 import { useSimulation } from './hooks/useSimulation';
 
-export default function App() {
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('ErrorBoundary caught:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#030712] text-slate-100 flex items-center justify-center p-6">
+          <div className="max-w-lg p-8 rounded-2xl bg-slate-900 border border-red-500/30 text-center space-y-4">
+            <h2 className="text-xl font-bold text-red-400">Something went wrong</h2>
+            <p className="text-sm text-slate-300 font-mono">
+              {this.state.error?.message || 'Unexpected application error.'}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-cyan-500/20"
+            >
+              Reload Application
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function MainApp() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const simulationHook = useSimulation();
 
@@ -111,6 +148,14 @@ export default function App() {
       {/* Academic Footer */}
       <Footer />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <MainApp />
+    </ErrorBoundary>
   );
 }
 

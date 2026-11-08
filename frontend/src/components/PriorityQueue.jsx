@@ -11,15 +11,13 @@ export default function PriorityQueue({ snapshot, currentStepIndex }) {
     );
   }
 
-  const {
-    popped_state = [0, 0],
-    heuristic: popped_h = 0,
-    reason = '',
-    queue_contents = [],
-    queue_size = 0,
-    action_taken = '',
-    successors = []
-  } = snapshot;
+  const popped_state = snapshot.popped_state || snapshot.selected_state || [0, 0];
+  const popped_h = snapshot.heuristic ?? snapshot.h ?? 0;
+  const reason = snapshot.reason || snapshot.selection_reason || '';
+  const queue_contents = snapshot.queue_contents || snapshot.queue_state || [];
+  const queue_size = snapshot.queue_size ?? queue_contents.length;
+  const action_taken = snapshot.action_taken || snapshot.action || '';
+  const successors = snapshot.successors || snapshot.generated_successors || [];
 
   return (
     <div className="glass-panel p-5 sm:p-6 space-y-5">
@@ -61,11 +59,11 @@ export default function PriorityQueue({ snapshot, currentStepIndex }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="text-2xl sm:text-3xl font-extrabold font-mono text-white tracking-wider">
-              ({popped_state[0]}, {popped_state[1]})
+              ({popped_state?.[0] ?? 0}, {popped_state?.[1] ?? 0})
             </div>
             <div className="text-xs text-slate-400">
               <span className="text-slate-300 block font-medium">{action_taken}</span>
-              <span className="font-mono text-[11px] text-slate-500">Jug A: {popped_state[0]}L | Jug B: {popped_state[1]}L</span>
+              <span className="font-mono text-[11px] text-slate-500">Jug A: {popped_state?.[0] ?? 0}L | Jug B: {popped_state?.[1] ?? 0}L</span>
             </div>
           </div>
         </div>
@@ -100,15 +98,15 @@ export default function PriorityQueue({ snapshot, currentStepIndex }) {
                 className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 text-xs transition-all font-mono"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-slate-400 text-[10px] w-5">#{item.priority}</span>
+                  <span className="text-slate-400 text-[10px] w-5">#{item.priority ?? idx + 1}</span>
                   <span className="font-bold text-white text-sm">
-                    ({item.state[0]}, {item.state[1]})
+                    ({item.state?.[0] ?? 0}, {item.state?.[1] ?? 0})
                   </span>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <span className="text-slate-400 text-[11px]">
-                    h(x,y) = <strong className="text-cyan-300">{item.h}</strong>
+                    h(x,y) = <strong className="text-cyan-300">{item.h ?? item.heuristic ?? 0}</strong>
                   </span>
                   <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] text-slate-300">
                     Waiting in Heap
